@@ -28,7 +28,13 @@ jobs:
       uses: hashicorp/setup-terraform@v2
 
     - name: Terraform Init
-      run: TF_LOG=DEBUG terraform init -reconfigure
+      run: TF_LOG=DEBUG terraform init #-reconfigure
+
+    - name: Terraform format
+      run: terraform fmt
+    
+    - name: Terraform validate
+      run: terraform validate
 
     - name: Terraform Plan
       run: terraform plan
