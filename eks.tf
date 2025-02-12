@@ -1,4 +1,4 @@
-
+#add IAM full access to my IAM role to create the eks_role
 resource "aws_iam_role" "eks_role" {
     name = "eks-cluster-role"
 
