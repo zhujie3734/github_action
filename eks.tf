@@ -8,7 +8,8 @@ resource "aws_iam_role" "eks_role" {
         Statement = [{
             Effect = "Allow"
             Principal = {
-                Service = "ec2.amazonaws.com"
+                Service = ["ec2.amazonaws.com",
+                            "eks.amazonaws.com"]
             }
             Action: "sts:AssumeRole"
         }]
