@@ -1,4 +1,5 @@
 #add IAM full access to my IAM role to create the eks_role
+#create custom eks full access policy
 resource "aws_iam_role" "eks_role" {
     name = "eks-cluster-role"
 
