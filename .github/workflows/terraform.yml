@@ -42,6 +42,20 @@ jobs:
     - name: Create master node first
       if: github.ref == 'refs/heads/main'
       run: terraform apply -target=aws_eks_cluster.eks_cluster -auto-approve
+    
+    - name: Install AWS CLI (if missing)
+      run: |
+        if ! command -v aws &> /dev/null; then
+          echo "Installing AWS CLI..."
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+        else
+          echo "AWS CLI is already installed."
+        fi
+
+    - name: Verify AWS Identity
+      run: aws sts get-caller-identity
 
     - name: Generate kubeconfig
       run: |
@@ -49,6 +63,9 @@ jobs:
         aws eks update-kubeconfig --region eu-north-1 --name minimal-eks-cluster --kubeconfig $HOME/.kube/config
       env:
         KUBECONFIG: $HOME/.kube/config
+
+    - name: Check EKS Cluster Status
+      run: aws eks describe-cluster --name minimal-eks-cluster --query "cluster.status"
 
     - name: Upload kubeconfig as an artifact
       uses: actions/upload-artifact@v4   #artifact v3 has deprecated
