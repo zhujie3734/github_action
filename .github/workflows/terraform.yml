@@ -63,6 +63,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Check if kubeconfig exists
+        run: |
+          if [ -f "$HOME/.kube/config" ]; then
+            echo "✅ kubeconfig exists!"
+            cat $HOME/.kube/config
+          else
+            echo "❌ kubeconfig was NOT created!"
+            exit 1
+          fi
+
       - name: Download kubeconfig
         uses: actions/download-artifact@v4
         with:
