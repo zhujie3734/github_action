@@ -132,3 +132,10 @@ jobs:
 
       - name: Apply Worker Nodes & Kubernetes Resources
         run: terraform apply -auto-approve
+
+      - name: Verify EKS Node Group Status
+        run: aws eks describe-nodegroup --cluster-name minimal-eks-cluster --nodegroup-name minimal-node-group
+      
+      - name: Test EKS Nodes
+        run: |
+          kubectl get nodes || echo "❌ Nodes not found! Possible failure in joining the cluster."

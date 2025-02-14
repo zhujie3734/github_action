@@ -7,7 +7,8 @@ resource "aws_iam_role" "eks_node_role" {
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Service = "ec2.amazonaws.com"
+        Service = ["ec2.amazonaws.com",
+                    "eks.amazonaws.com"]
       }
       Action = "sts:AssumeRole"
     }]
@@ -42,6 +43,7 @@ resource "aws_eks_node_group" "node_group" {
     max_size     = 2
     min_size     = 1
   }
+
   depends_on = [
     aws_iam_role_policy_attachment.node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
