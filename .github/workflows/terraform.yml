@@ -51,7 +51,7 @@ jobs:
         KUBECONFIG: $HOME/.kube/config
 
     - name: Upload kubeconfig as an artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4   #artifact v3 has deprecated
       with:
         name: kubeconfig
         path: $HOME/.kube/config
@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download kubeconfig
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: kubeconfig
           path: $HOME/.kube/
