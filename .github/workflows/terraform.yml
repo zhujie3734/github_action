@@ -59,24 +59,24 @@ jobs:
 
     - name: Generate kubeconfig
       run: |
-        mkdir -p $HOME/.kube
-        aws eks update-kubeconfig --region eu-north-1 --name minimal-eks-cluster --kubeconfig $HOME/.kube/config
+        mkdir -p /home/runner/.kube
+        aws eks update-kubeconfig --region eu-north-1 --name minimal-eks-cluster --kubeconfig /home/runner/.kube/config
       env:
-        KUBECONFIG: $HOME/.kube/config
+        KUBECONFIG: /home/runner/.kube/config
 
     - name: Check EKS Cluster Status
       run: aws eks describe-cluster --name minimal-eks-cluster --query "cluster.status"
 
     - name: Debug kubeconfig Path
       run: |
-        ls -lah $HOME/.kube
-        cat $HOME/.kube/config || echo "❌ kubeconfig file not found!"
+        ls -lah /home/runner/.kube
+        cat /home/runner//.kube/config || echo "❌ kubeconfig file not found!"
 
     - name: Upload kubeconfig as an artifact
       uses: actions/upload-artifact@v4   #artifact v3 has deprecated
       with:
         name: kubeconfig
-        path: $HOME/.kube/config
+        path: /home/runner/.kube/config
   
   deploy-worknode:
     runs-on: ubuntu-latest
@@ -87,9 +87,9 @@ jobs:
 
       - name: Check if kubeconfig exists
         run: |
-          if [ -f "$HOME/.kube/config" ]; then
+          if [ -f "/home/runner/.kube/config" ]; then
             echo "✅ kubeconfig exists!"
-            cat $HOME/.kube/config
+            cat /home/runner/.kube/config
           else
             echo "❌ kubeconfig was NOT created!"
             exit 1
@@ -99,10 +99,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: kubeconfig
-          path: $HOME/.kube/
+          path: /home/runner/.kube/
 
       - name: Set KUBECONFIG Environment Variable
-        run: echo "KUBECONFIG=$HOME/.kube/config" >> $GITHUB_ENV
+        run: echo "KUBECONFIG=/home/runner/.kube/config" >> $GITHUB_ENV
 
       - name: Verify kubectl Access
         run: kubectl get nodes
