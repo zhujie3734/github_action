@@ -41,7 +41,9 @@ jobs:
 
     - name: Create master node first
       if: github.ref == 'refs/heads/main'
-      run: terraform apply -target=aws_eks_cluster.eks_cluster -auto-approve
+      run: |
+        set -e
+        terraform apply -target=aws_eks_cluster.eks_cluster -auto-approve || (echo "Terraform apply failed! Destroying resources..." && terraform destroy -auto-approve && exit 1)
     
     - name: Install AWS CLI (if missing)
       run: |
@@ -103,6 +105,30 @@ jobs:
           fi
           
           echo "✅ CoreDNS is running!"
+
+  cleanup:
+    if: failure()
+    needs: deploy-cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
   
   deploy-worknode:
     runs-on: ubuntu-latest
