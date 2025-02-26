@@ -38,6 +38,11 @@ resource "aws_eks_node_group" "node_group" {
   subnet_ids      = [aws_subnet.public_subnet_1.id,
                      aws_subnet.public_subnet_2.id]
 
+  remote_access {
+    #ec2_ssh_key = "my-key-pair"  # Optional: SSH Key for login
+    source_security_group_ids = [aws_security_group.eks_worker_sg.id] 
+  }
+  
   scaling_config {
     desired_size = 1
     max_size     = 2
@@ -51,10 +56,6 @@ resource "aws_eks_node_group" "node_group" {
   timeouts {
     create = "10m"
     delete = "5m"
-  }
-
-  vpc_config {
-    security_group_ids = [aws_security_group.eks_sg.id]
   }
 
 
