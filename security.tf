@@ -16,7 +16,7 @@ resource "aws_security_group" "eks_worker_sg" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.eks_worker_sg.id]
+    self        = true
   }
 
   # Allow communication from worker nodes to control plane
