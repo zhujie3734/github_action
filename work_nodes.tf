@@ -37,6 +37,9 @@ resource "aws_eks_node_group" "node_group" {
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = [aws_subnet.public_subnet_1.id,
                      aws_subnet.public_subnet_2.id]
+  
+  ami_type = "AL2_x86_64"
+  instance_types =["t3.medium"]
 
   remote_access {
     #ec2_ssh_key = "my-key-pair"  # Optional: SSH Key for login
@@ -49,15 +52,11 @@ resource "aws_eks_node_group" "node_group" {
     min_size     = 1
   }
 
-  ami_type = "AL2_x86_64"
-  instance_types =["t3.medium"]
-
   #the default fail join time is 30mins, take too long to throw exception
   timeouts {
     create = "10m"
     delete = "5m"
   }
-
 
   depends_on = [
     aws_iam_role_policy_attachment.node_policy,

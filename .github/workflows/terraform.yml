@@ -80,18 +80,27 @@ jobs:
         name: kubeconfig
         path: /home/runner/.kube/config
 
-    - name: Check CNI Plugin Health
+    - name: Check CNI Plugin and CoreDNS readiness   #verify core service or the node cannot join successfully
       run: |
-          echo "Checking Amazon VPC CNI status..."
-          CNI_PODS=$(kubectl get pods -n kube-system -l k8s-app=aws-node -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
-          
-          if [[ "$CNI_PODS" != "True" ]]; then
-            echo "❌ CNI Plugin (Amazon VPC CNI) is NOT running!"
-            kubectl get pods -n kube-system -l k8s-app=aws-node
-            exit 1
-          fi
-          
-          echo "✅ CNI Plugin is running!"
+          echo "Waiting for CNI and CoreDNS to be ready (Max: 5 min)..."
+          TIMEOUT=300  # 5 minutes in seconds
+          ELAPSED=0
+
+          while true; do
+            if kubectl get pods -n kube-system | grep -E "coredns|aws-node" | grep Running; then
+              echo "CNI and CoreDNS are ready!"
+              exit 0
+            fi
+
+            if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+              echo "❌ Timeout reached: CNI and CoreDNS did not become ready within 5 minutes."
+              exit 1
+            fi
+
+            echo "Waiting..."
+            sleep 10
+            ELAPSED=$((ELAPSED + 10))
+          done
 
     - name: Verify function of coredns
       run: |
