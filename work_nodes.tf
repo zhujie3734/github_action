@@ -42,7 +42,7 @@ resource "aws_eks_node_group" "node_group" {
   instance_types =["t3.medium"]
 
   remote_access {
-    #ec2_ssh_key = "my-key-pair"  # Optional: SSH Key for login
+    ec2_ssh_key = "my-key-pair"  # sshKey in remote-access can't be empty
     source_security_group_ids = [aws_security_group.eks_worker_sg.id] 
   }
   
@@ -66,6 +66,7 @@ resource "aws_eks_node_group" "node_group" {
 }
 
 resource "kubernetes_config_map" "aws_auth" {
+  depends_on = [aws_eks_node_group.node_group]
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
