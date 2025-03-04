@@ -155,8 +155,11 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      - name: Verify kubectl Access
-        run: kubectl get nodes
+      - name: Verify kubectl Access and eks api
+        run: |
+          echo $KUBECONFIG
+          kubectl config view --minify
+          kubectl get nodes
 
 
       - name: Setup Terraform
@@ -173,6 +176,8 @@ jobs:
   
       - name: Terraform Plan
         run: terraform plan
+        env:
+          KUBECONFIG: /home/runner/.kube/config
 
       - name: Apply Worker Nodes & Kubernetes Resources
         run: terraform apply -auto-approve
