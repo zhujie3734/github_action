@@ -157,9 +157,9 @@ jobs:
 
       - name: Verify kubectl Access and eks api
         run: |
-          echo $KUBECONFIG
           kubectl config view --minify
           kubectl get nodes
+          curl -k $(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')/version
 
 
       - name: Setup Terraform

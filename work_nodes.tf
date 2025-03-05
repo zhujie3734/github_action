@@ -82,7 +82,9 @@ resource "aws_eks_node_group" "node_group" {
 }
 
 resource "kubernetes_config_map" "aws_auth" {
-  depends_on = [aws_eks_node_group.node_group]
+  depends_on = [aws_eks_node_group.node_group,
+                provider.kubernetes
+                ]
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
