@@ -158,7 +158,7 @@ jobs:
       - name: Verify kubectl Access and eks api
         run: |
           kubectl config view --minify
-          kubectl get configmap aws-auth -n kube-system -o yaml
+          #kubectl get configmap aws-auth -n kube-system -o yaml
           curl -k $(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')/version
 
 
