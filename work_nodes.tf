@@ -81,6 +81,14 @@ resource "aws_eks_node_group" "node_group" {
   ]
 }
 
+data "kubernetes_config_map" "existing_aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+}
+
+
 resource "kubernetes_config_map" "aws_auth" {
   depends_on = [aws_eks_node_group.node_group,
                 data.aws_eks_cluster.cluster,
@@ -91,12 +99,15 @@ resource "kubernetes_config_map" "aws_auth" {
   }
 
   data = {
-    "mapRoles" = yamlencode([
-      {
-        rolearn  = aws_iam_role.eks_node_role.arn
-        username = "system:node:{{EC2PrivateDNSName}}"
-        groups   = ["system:bootstrappers", "system:nodes"]
-      }
-    ])
+    "mapRoles" = yamlencode(
+      concat(
+        try(yamldecode(data.kubernetes_config_map.existing_aws_auth.data["mapRoles"]), []),
+        [
+          {
+            rolearn  = aws_iam_role.eks_node_role.arn
+            username = "system:node:{{EC2PrivateDNSName}}"
+            groups   = ["system:bootstrappers", "system:nodes"]
+          }
+    ]))
   }
 }
