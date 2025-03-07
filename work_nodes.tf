@@ -86,6 +86,11 @@ data "kubernetes_config_map" "existing_aws_auth" {
     name      = "aws-auth"
     namespace = "kube-system"
   }
+  
+  depends_on = [aws_eks_node_group.node_group,
+                data.aws_eks_cluster.cluster,
+                data.aws_eks_cluster_auth.cluster_auth ]
+
 }
 
 
