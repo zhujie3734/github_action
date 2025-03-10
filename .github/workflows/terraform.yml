@@ -79,42 +79,6 @@ jobs:
       with:
         name: kubeconfig
         path: /home/runner/.kube/config
-
-    # - name: Check CNI Plugin and CoreDNS readiness   #verify core service or the node cannot join successfully
-    #   run: |
-    #       echo "Waiting for CNI and CoreDNS to be ready (Max: 5 min)..."
-    #       TIMEOUT=300  # 5 minutes in seconds
-    #       ELAPSED=0
-
-    #       while true; do
-    #         if kubectl get pods -n kube-system | grep -E "coredns|aws-node" | grep Running; then
-    #           echo "CNI and CoreDNS are ready!"
-    #           exit 0
-    #         fi
-
-    #         if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-    #           echo "❌ Timeout reached: CNI and CoreDNS did not become ready within 5 minutes."
-    #           exit 1
-    #         fi
-
-    #         echo "Waiting..."
-    #         sleep 10
-    #         ELAPSED=$((ELAPSED + 10))
-    #       done
-
-    # - name: Verify function of coredns
-    #   run: |
-    #     echo "Checking CoreDNS status..."
-    #       COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
-          
-    #       if [[ "$COREDNS_STATUS" != "True" ]]; then
-    #         echo "❌ CoreDNS is NOT running!"
-    #         kubectl get pods -n kube-system
-    #         exit 1
-    #       fi
-          
-    #       echo "✅ CoreDNS is running!"
-
   
   deploy-worknode:
     runs-on: ubuntu-latest
@@ -158,7 +122,6 @@ jobs:
       - name: Verify kubectl Access and eks api
         run: |
           kubectl config view --minify
-          #kubectl get configmap aws-auth -n kube-system -o yaml
           curl -k $(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')/version
 
 
@@ -188,6 +151,7 @@ jobs:
       - name: Test EKS Nodes
         run: |
           kubectl get nodes || echo "❌ Nodes not found! Possible failure in joining the cluster."
+          kubectl get configmap aws-auth -n kube-system -o yaml
       
       - name: Check Node Status
         id: check_nodes
@@ -214,16 +178,48 @@ jobs:
               echo "connectivity=fail" >> $GITHUB_ENV
             fi
   
-      - name: Destroy EKS Cluster if Check Fails
+      - name: Check EKS node readiness
         
         run: |
             if: env.status == 'fail' || env.connectivity == 'fail'
               echo "Node health check failed, destroying cluster..."
               exit 1
-              terraform init
-              terraform destroy -auto-approve
-      
 
+      - name: Check CNI Plugin and CoreDNS readiness
+        run: |
+          echo "Waiting for CNI and CoreDNS to be ready (Max: 5 min)..."
+          TIMEOUT=300  # 5 minutes in seconds
+          ELAPSED=0
+
+          while true; do
+            if kubectl get pods -n kube-system | grep -E "coredns|aws-node" | grep Running; then
+              echo "CNI and CoreDNS are ready!"
+              exit 0
+            fi
+
+            if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+              echo "❌ Timeout reached: CNI and CoreDNS did not become ready within 5 minutes."
+              exit 1
+            fi
+
+            echo "Waiting..."
+            sleep 10
+            ELAPSED=$((ELAPSED + 10))
+          done
+
+      - name: Verify function of coredns
+        run: |
+          echo "Checking CoreDNS status..."
+            COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
+            
+            if [[ "$COREDNS_STATUS" != "True" ]]; then
+              echo "❌ CoreDNS is NOT running!"
+              kubectl get pods -n kube-system
+              exit 1
+            fi
+            
+            echo "✅ CoreDNS is running!"
+  
   cleanup:
     if: failure()
     needs: deploy-worknode
