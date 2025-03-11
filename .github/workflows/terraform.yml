@@ -205,12 +205,14 @@ jobs:
             sleep 10
             ELAPSED=$((ELAPSED + 10))
           done
-          COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
-          echo $COREDNS_STATUS
+          
+          
+          
 
-      # - name: Verify function of coredns
-      #   run: |
-      #     echo "Checking CoreDNS status..."
+      - name: Verify function of coredns
+        run: |
+           echo "Checking CoreDNS status..."
+           kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}'
       #       COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
             
       #       if [[ "$COREDNS_STATUS" != "True" ]]; then
