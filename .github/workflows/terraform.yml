@@ -179,9 +179,8 @@ jobs:
             fi
   
       - name: Check EKS node readiness
-        
+        if: ${{ env.status == 'fail' || env.connectivity == 'fail' }}
         run: |
-            if: env.status == 'fail' || env.connectivity == 'fail'
               echo "Node health check failed, destroying cluster..."
               exit 1
 
