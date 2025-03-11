@@ -213,8 +213,8 @@ jobs:
         run: |
            echo "Checking CoreDNS status..."
            kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}'
-      #       COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
-            
+      #       COREDNS_STATUS=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}'| tr ' ' '\n'| sort | uniq)
+              #return true true deduplicate the value before processing it
       #       if [[ "$COREDNS_STATUS" != "True" ]]; then
       #         echo "❌ CoreDNS is NOT running!"
       #         kubectl get pods -n kube-system
@@ -224,7 +224,8 @@ jobs:
       #       echo "✅ CoreDNS is running!"
   
   cleanup:
-    if: failure()
+    #if: failure()
+    if: always()
     needs: deploy-worknode
     runs-on: ubuntu-latest
     steps:
