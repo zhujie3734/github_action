@@ -46,6 +46,12 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly_policy" {
   role       = aws_iam_role.eks_node_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "eks_lb_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
+  role       = aws_iam_role.eks_node_role.name
+}
+
+
 
 resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
@@ -78,9 +84,9 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
     aws_iam_role_policy_attachment.ecr_readonly_policy
+    aws_iam_role_policy_attachment.eks_lb_policy
   ]
 }
-
 
 
 # resource "kubernetes_config_map" "aws_auth" {

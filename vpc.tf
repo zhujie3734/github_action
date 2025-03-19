@@ -20,6 +20,7 @@ resource "aws_subnet" "public_subnet_1" {
     tags = {
     Name = "public-subnet-1"
     "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/minimal-eks-cluster" = "owned"
   }
 }
 
@@ -32,6 +33,7 @@ resource "aws_subnet" "public_subnet_2" {
   tags = {
     Name = "public-subnet-2"
     "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/minimal-eks-cluster" = "owned"
   }
 
 }
