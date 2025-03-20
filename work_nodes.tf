@@ -83,7 +83,7 @@ resource "aws_eks_node_group" "node_group" {
   depends_on = [
     aws_iam_role_policy_attachment.node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
-    aws_iam_role_policy_attachment.ecr_readonly_policy
+    aws_iam_role_policy_attachment.ecr_readonly_policy,
     aws_iam_role_policy_attachment.eks_lb_policy
   ]
 }

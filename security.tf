@@ -57,7 +57,7 @@ resource "aws_security_group" "eks_worker_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  # Allow HTTPS
   }
-}
+
 }
 
 
