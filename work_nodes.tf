@@ -31,6 +31,14 @@ resource "aws_iam_role" "eks_node_role" {
   })
 }
 
+resource "aws_iam_policy" "aws_load_balancer_controller_policy" {
+  name        = "AWSLoadBalancerControllerIAMPolicy"
+  path        = "/"
+  description = "Policy for AWS Load Balancer Controller"
+
+  policy = file("iam_policy.json")
+}
+
 resource "aws_iam_role_policy_attachment" "node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_node_role.name
@@ -65,7 +73,7 @@ resource "aws_eks_node_group" "node_group" {
 
   remote_access {
     ec2_ssh_key = aws_key_pair.eks_key_pair.key_name  # sshKey in remote-access can't be empty
-    source_security_group_ids = [aws_security_group.eks_worker_sg.id] 
+    source_security_group_ids = [aws_security_group.eks_worker_sg.id]
   }
   
   scaling_config {
