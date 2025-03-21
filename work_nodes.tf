@@ -31,13 +31,13 @@ resource "aws_iam_role" "eks_node_role" {
   })
 }
 
-resource "aws_iam_policy" "aws_load_balancer_controller_policy" {
-  name        = "AWSLoadBalancerControllerIAMPolicy"
-  path        = "/"
-  description = "Policy for AWS Load Balancer Controller"
+# resource "aws_iam_policy" "aws_load_balancer_controller_policy" {
+#   name        = "AWSLoadBalancerControllerIAMPolicy"
+#   path        = "/"
+#   description = "Policy for AWS Load Balancer Controller"
 
-  policy = file("iam_policy.json")
-}
+#   policy = file("iam_policy.json")
+# }
 
 resource "aws_iam_role_policy_attachment" "node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -55,10 +55,10 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_lb_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/aws_load_balancer_controller_policy"
   role       = aws_iam_role.eks_node_role.name
 
-  depends_on = [aws_iam_policy.aws_load_balancer_controller_policy]
+  #depends_on = [aws_iam_policy.aws_load_balancer_controller_policy]
 }
 
 
