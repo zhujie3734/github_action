@@ -6,7 +6,7 @@ resource "tls_private_key" "eks_key" {
 
 # Create an AWS key pair using the generated public key
 resource "aws_key_pair" "eks_key_pair" {
-  key_name   = "my-eks-key"  # Change this to your preferred key name
+  key_name   = "my-eks-key"
   public_key = tls_private_key.eks_key.public_key_openssh
 
   tags = {
@@ -57,6 +57,8 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly_policy" {
 resource "aws_iam_role_policy_attachment" "eks_lb_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
   role       = aws_iam_role.eks_node_role.name
+
+  depends_on = [aws_iam_policy.aws_load_balancer_controller_policy]
 }
 
 
