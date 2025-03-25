@@ -2,13 +2,13 @@
 name: Terraform Deployment
 
 on:
-    push:
-      branches:
-        - main
-    pull_request:
-      branches:
-        - main
-    #workflow_dispatch:
+    # push:
+    #   branches:
+    #     - main
+    # pull_request:
+    #   branches:
+    #     - main
+    workflow_dispatch:
   
 jobs:
   deploy-cluster:
@@ -225,7 +225,7 @@ jobs:
       #       echo "✅ CoreDNS is running!"
   
   cleanup:
-    if: always()
+    if: failure()
     needs: deploy-worknode
     runs-on: ubuntu-latest
     steps:
@@ -238,6 +238,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
+
+      - name: Setup kubectl
+        run: |
+            aws eks update-kubeconfig --region eu-north-1 --name minimal-eks-cluster
+  
+      - name: Delete Kubernetes Service
+        run: |
+            kubectl delete svc myapp-service || echo "Service already deleted"
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -289,7 +297,8 @@ jobs:
 
       - name: Replace Image in Deployment YAML
         run: |
-          sed -i 's|$DOCKER_IMAGE|${{ secrets.DOCKERHUB_USERNAME }}/java-app:latest|g' k8s/deployment.yaml
+          
+          sed -i 's|$DOCKER_IMAGE|nginx:latest|g' k8s/deployment.yaml
 
       - name: Deploy to EKS
         run: |
@@ -299,3 +308,5 @@ jobs:
       - name: Check SVC URL
         run: |
           kubectl get svc myapp-service
+
+#sed -i 's|$DOCKER_IMAGE|${{ secrets.DOCKERHUB_USERNAME }}/java-app:latest|g' k8s/deployment.yaml
