@@ -225,7 +225,7 @@ jobs:
       #       echo "✅ CoreDNS is running!"
   
   cleanup:
-    if: always()
+    if: failure()
     needs: deploy-worknode
     runs-on: ubuntu-latest
     steps:
