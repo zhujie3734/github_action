@@ -87,7 +87,7 @@ resource "aws_eks_node_group" "node_group" {
   #the default fail join time is 30mins, take too long to throw exception
   timeouts {
     create = "10m"
-    delete = "7m"
+    delete = "8m"
   }
 
   depends_on = [
