@@ -124,46 +124,46 @@ resource "aws_security_group" "eks_control_plane_sg" {
   }
 }
 
-resource "aws_network_acl" "public_nacl" {
-  vpc_id = aws_vpc.eks_vpc.id
-  subnet_ids = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+# resource "aws_network_acl" "public_nacl" {
+#   vpc_id = aws_vpc.eks_vpc.id
+#   subnet_ids = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
 
-  tags = {
-    Name = "public-nacl"
-  }
-}
+#   tags = {
+#     Name = "public-nacl"
+#   }
+# }
 
-# ✅ 允许所有 HTTP (80) 和 HTTPS (443) 访问 NLB
-resource "aws_network_acl_rule" "allow_http_inbound" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 100
-  protocol       = "tcp"
-  rule_action    = "allow"
-  egress         = false
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 80
-  to_port        = 80
-}
+# # ✅ 允许所有 HTTP (80) 和 HTTPS (443) 访问 NLB
+# resource "aws_network_acl_rule" "allow_http_inbound" {
+#   network_acl_id = aws_network_acl.public_nacl.id
+#   rule_number    = 100
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   egress         = false
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 80
+#   to_port        = 80
+# }
 
-resource "aws_network_acl_rule" "allow_https_inbound" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 110
-  protocol       = "tcp"
-  rule_action    = "allow"
-  egress         = false
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 443
-  to_port        = 443
-}
+# resource "aws_network_acl_rule" "allow_https_inbound" {
+#   network_acl_id = aws_network_acl.public_nacl.id
+#   rule_number    = 110
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   egress         = false
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 443
+#   to_port        = 443
+# }
 
-# ✅ 允许 NLB 健康检查流量
-resource "aws_network_acl_rule" "allow_nlb_health_check" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 120
-  protocol       = "tcp"
-  rule_action    = "allow"
-  egress         = false
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 1024
-  to_port        = 65535
-}
+# # ✅ 允许 NLB 健康检查流量
+# resource "aws_network_acl_rule" "allow_nlb_health_check" {
+#   network_acl_id = aws_network_acl.public_nacl.id
+#   rule_number    = 120
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   egress         = false
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 1024
+#   to_port        = 65535
+# }

@@ -19,7 +19,7 @@ spec:
         - name: myapp
           image: $DOCKER_IMAGE
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           env:
             - name: ENVIRONMENT
               value: "production"
@@ -33,6 +33,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     #service.beta.kubernetes.io/aws-load-balancer-internal: "false"
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "traffic-port"
 spec:
   type: LoadBalancer
   selector:
@@ -40,4 +41,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 80
